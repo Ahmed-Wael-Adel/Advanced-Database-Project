@@ -10,6 +10,7 @@ const UpdateProduct= () => {
     const location = useLocation()
     const navigate = useNavigate();
 
+    const [image, setImage] = useState("");
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
@@ -19,8 +20,25 @@ const UpdateProduct= () => {
 
     const product = location.state.product;
 
+
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          setImage(file);
+    
+          // Create a preview of the image
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const img = reader.result;
+            setImage(img)
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
     useEffect(() => {
         
+        setImage(product.image)
         setName(product.name)
         setDescription(product.description)
         setCategory(product.category)
@@ -46,7 +64,8 @@ const UpdateProduct= () => {
                         name,
                         description,
                         category,
-                        price
+                        price,
+                        image
                     });
             
                     if (response.status === 200)
@@ -83,6 +102,10 @@ const UpdateProduct= () => {
             <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-md">
                 <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Add Product</h2>
                 <div className="flex flex-col space-y-4 text-left">
+                    <input 
+                        type="file"
+                        onChange={handleImageChange}
+                    />
                     <label className="text-sm font-medium text-gray-600">
                         Name
                     </label>

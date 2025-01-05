@@ -9,7 +9,8 @@ router.post("/add", async(req, res) => {
             name: req.body.name,
             description: req.body.description,
             category: req.body.category,
-            price: req.body.price
+            price: req.body.price,
+            image: req.body.image,
         }
 
         const result = await Product.create(newProduct);
@@ -55,11 +56,39 @@ router.get("/category", async(req, res) => {
     
 })
 
+router.get("/category/:search", async(req, res) => {
+    try{
+        
+        const search = req.params.search
+        console.log(search)
+        const products = await Product.find({category: search})
+        
+        if(!products)
+        {
+            console.log("No Products")
+        } 
+        else
+        {
+            console.log("========================")
+            console.log(products)
+            return res.status(200).json({
+                data: products
+            })
+        }
+    }
+    catch(error){
+        res.status(500).send({
+            message: error.message
+        })
+    }
+    
+})
+
 router.put("/update/:id", async(req, res) => {
     const {id} = req.params;
-    const {name, description, category, price} = req.body
+    const {image, name, description, category, price} = req.body
     try{
-        const result = await Product.findByIdAndUpdate(id, {name, description, category, price}, { new: true })
+        const result = await Product.findByIdAndUpdate(id, { name, description, category, price, image}, { new: true })
         if(result)
         {
             res.status(200).send({

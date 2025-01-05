@@ -6,11 +6,19 @@ import LoadingBar from "../components/loadingBar";
 
 const Admin = () => {
     const [loading, isLoading] = useState(true)
+    const [search, setSearch] = useState("")
     const [products, setProducts] = useState([])
     const navigate = useNavigate()
 
     const handleclick = () => {
         navigate("/addProduct")
+    }
+
+    const handleClear = () => {
+        isLoading(true)
+        setSearch("");
+        fetchProducts();
+        isLoading(false)
     }
 
     const fetchProducts = async () => {
@@ -48,6 +56,23 @@ const Admin = () => {
         
     }
 
+    const handleSearch = async () => {
+        isLoading(true)
+        try{
+            const response = await axios.get(`http://localhost:3000/product/category/${search}`)
+            console.log(response.data.data)
+            setProducts(response.data.data)
+            isLoading(false)
+            
+        }
+        catch(error)
+        {
+            console.log(error.message)
+            isLoading(false)
+        }
+
+    }
+
     useEffect(() => {
         
         fetchProducts();
@@ -63,21 +88,21 @@ const Admin = () => {
     return(
         <div className="flex flex-col h-screen">
             <div className="flex flex-row justify-center gap-40 p-5">
-                <button className="py-2 px-4 bg-sky-500 text-white rounded-md hover:bg-sky-600">
-                    Headset
-                </button>
-                <button className="py-2 px-4 bg-sky-500 text-white rounded-md hover:bg-sky-600">
-                    Keyboard
-                </button>
-                <button className="py-2 px-4 bg-sky-500 text-white rounded-md hover:bg-sky-600">
-                    Mouse
-                </button>
-                <button className="py-2 px-4 bg-sky-500 text-white rounded-md hover:bg-sky-600">
-                    Mouse Pad
-                </button>
-                <button className="py-2 px-4 bg-sky-500 text-white rounded-md hover:bg-sky-600">
-                    All
-                </button>
+                <div className="flex flex-row py-2 gap-2">
+                    <input className="border border-sky-500 p-2 rounded-xl"
+                            placeholder="Search..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <button onClick={handleSearch}
+                            className="py-2 px-4 bg-sky-500 text-white rounded-md hover:bg-sky-600 rounded-xl">
+                            Search
+                    </button>
+                    <button onClick={handleClear}
+                            className="py-2 px-4 bg-sky-500 text-white rounded-md hover:bg-sky-600 rounded-xl">
+                            Clear
+                    </button>
+                </div>
             </div>
             <div className=" flex flex-col items-center">
                 {products.length > 0 ? (
@@ -85,6 +110,7 @@ const Admin = () => {
                     {products.map((product) => (
                         <div className="bg-white  drop-shadow-xl p-4 flex flex-col rounded-lg hover:shadow-xl items-center "
                             key={product._id}>
+                            <img src={`${product.image}`}/>
                             <strong>{product.name}</strong>
                             <h1 className="">Description: {product.description}</h1>
                             <h1>Category: {product.category}</h1>
